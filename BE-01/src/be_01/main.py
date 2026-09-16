@@ -5,6 +5,9 @@ app = FastAPI()
 
 class CreateTask(BaseModel):
     title: str
+class UpdateTask(BaseModel):
+    title: str | None = None
+    done: bool | None = None
 
 tasks: list[dict] = [
         {"id":1,"title":"shopping","done":True},
@@ -40,7 +43,7 @@ def get_specific_task(id: int) -> dict:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail={"error":f"Task {id} not found"})
 
 @app.post("/tasks",status_code=status.HTTP_201_CREATED)
-def create_task(new_task: CreateTask):
+def create_task(new_task: CreateTask) -> dict:
     """ Create a new task """
     if not new_task.title.strip():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="empty task title")
@@ -55,3 +58,28 @@ def create_task(new_task: CreateTask):
     tasks.append(created_task)
     return created_task
 
+@app.put("/tasks/{id}",status_code=status.HTTP_200_OK)
+def update_task(id: int, updated_task: UpdateTask) -> dict:
+    """ Update existing entry """
+    for task in tasks:
+        if task["id"] == id:
+            if updated_task.done is not None:
+                task["done"] = updated_task.done
+            if updated_task.title is not None:
+                if not updated_task.title.strip():
+                    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="title can't be empty")
+                task["title"] = updated_task.title.strip()
+            return task
+
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Unknown id")
+
+@app.delete("/tasks/{id}",status_code=status.HTTP_204_NO_CONTENT)
+def delete_task(id: int) -> dict:
+    for task in tasks:
+        if task["id"] == id:
+            index = tasks.index(task)
+            removed_task = tasks.pop(index)
+            return removed_task
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Unknown id")
+
+        
