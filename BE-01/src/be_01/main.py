@@ -3,21 +3,24 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+# validation
 class CreateTask(BaseModel):
     title: str
 class UpdateTask(BaseModel):
     title: str | None = None
     done: bool | None = None
 
+# database in memory
 tasks: list[dict] = [
         {"id":1,"title":"shopping","done":True},
         {"id":2,"title":"cooking","done":False},
         {"id":3,"title":"studying","done":False}
         ]
 
+# get operations
 @app.get("/",status_code=status.HTTP_200_OK)
 def root() -> dict:
-    """ Returns the root of the API """
+    """ Return the root of the API """
     return {
             "name":"Task API", 
             "Version":"1.0",
@@ -26,22 +29,23 @@ def root() -> dict:
 
 @app.get("/health",status_code=status.HTTP_200_OK)
 def health_check() -> dict:
-    """ Checks API health """
+    """ Check API health """
     return {"status":"ok"}
 
 @app.get("/tasks",status_code=status.HTTP_200_OK)
 def check_tasks() -> list:
-    """ Shows all tasks """
+    """ Show all tasks """
     return tasks
 
 @app.get("/tasks/{id}",status_code=status.HTTP_200_OK)
 def get_specific_task(id: int) -> dict:
-    """ Shows specific task """
+    """ Show specific task """
     for task in tasks:
         if task["id"] == id:
             return task
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail={"error":f"Task {id} not found"})
 
+# post operation
 @app.post("/tasks",status_code=status.HTTP_201_CREATED)
 def create_task(new_task: CreateTask) -> dict:
     """ Create a new task """
@@ -58,6 +62,7 @@ def create_task(new_task: CreateTask) -> dict:
     tasks.append(created_task)
     return created_task
 
+# put operations
 @app.put("/tasks/{id}",status_code=status.HTTP_200_OK)
 def update_task(id: int, updated_task: UpdateTask) -> dict:
     """ Update existing entry """
@@ -73,8 +78,10 @@ def update_task(id: int, updated_task: UpdateTask) -> dict:
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Unknown id")
 
+# delete operations
 @app.delete("/tasks/{id}",status_code=status.HTTP_204_NO_CONTENT)
 def delete_task(id: int) -> dict:
+    """ Delete existing entry """
     for task in tasks:
         if task["id"] == id:
             index = tasks.index(task)
