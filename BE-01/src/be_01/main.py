@@ -1,4 +1,4 @@
-from fastapi import FastAPI,HTTPException,status
+from fastapi import FastAPI,HTTPException,status,Response
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -79,14 +79,14 @@ def update_task(id: int, updated_task: UpdateTask) -> dict:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Unknown id")
 
 # delete operations
-@app.delete("/tasks/{id}",status_code=status.HTTP_204_NO_CONTENT)
-def delete_task(id: int) -> dict:
+@app.delete("/tasks/{id}",status_code=status.HTTP_204_NO_CONTENT,response_class=Response)
+def delete_task(id: int) -> None:
     """ Delete existing entry """
     for task in tasks:
         if task["id"] == id:
             index = tasks.index(task)
-            removed_task = tasks.pop(index)
-            return removed_task
+            tasks.pop(index)
+            return 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Unknown id")
 
         
