@@ -35,19 +35,17 @@ def health_check() -> dict:
 @app.get("/tasks",status_code=status.HTTP_200_OK)
 def check_tasks(done: bool|None = None, search: str|None = None) -> list[dict]:
     """ Show all tasks or query or search """
-    if done is not None:
-        tasks_done = []
-        for task in tasks:
-            if task["done"] == done:
-                tasks_done.append(task)
-        return tasks_done
-    if search is not None:
-        tasks_search = []
-        for task in tasks:
-            if task["title"] == search:
-                tasks_search.append(task)
-        return tasks_search
-    return tasks
+    if done is None and search is None:
+        return tasks
+    checked_tasks = []
+    for task in tasks:
+        if done is not None and task["done"] != done:
+            continue
+        if search is not None and search not in task["title"]:
+            continue
+        checked_tasks.append(task)
+    return checked_tasks
+    
 
 @app.get("/tasks/{id}",status_code=status.HTTP_200_OK)
 def get_specific_task(id: int) -> dict:
