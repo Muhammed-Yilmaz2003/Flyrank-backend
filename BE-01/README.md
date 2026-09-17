@@ -61,7 +61,7 @@ It uses python 3.12 and FastAPI.
 | :--- | :--- | :--- | :--- | :--- |
 | `GET` | `/` | Returns basic API metadata | `200 OK` | — |
 | `GET` | `/health` | Server health check | `200 OK` | — |
-| `GET` | `/tasks` | List all tasks | `200 OK` | — |
+| `GET` | `/tasks` | List all tasks or search or query| `200 OK` | — |
 | `GET` | `/tasks/{id}` | Retrieve a specific task by ID | `200 OK` | `404 Not Found` |
 | `POST` | `/tasks` | Create a new task | `201 Created` | `400 Bad Request` |
 | `PUT` | `/tasks/{id}` | Update title and/or done status | `200 OK` | `400 Bad Request`, `404 Not Found` |
@@ -103,4 +103,4 @@ FastAPI automatically generates interactive OpenAPI documentation.
 
 Once the server is running, visit **`http://127.0.0.1:8000/docs`** in your browser to test endpoints directly via your web browser.
 
-![Swagger UI Screenshot]()
+![Swagger UI Screenshot](/BE-01/assets/firefox_yhkxOqHncw.png)
